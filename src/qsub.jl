@@ -42,7 +42,7 @@ function launch(manager::Union{PBSManager, SGEManager}, params::Dict, instances_
         qsub_cmd = pipeline(`echo $(Base.shell_escape(cmd))` , (isPBS ? `qsub -N $jobname -j oe -k o -t 1-$np $queue $qsub_env` : `qsub -N $jobname -terse -j y -t 1-$np $queue $qsub_env`))
         out,qsub_proc = open(qsub_cmd)
         if !success(qsub_proc)
-            println("batch queue not available (could not run qsub)")
+            # println("batch queue not available (could not run qsub)")
             return
         end
         id = chomp(split(readline(out),'.')[1])
@@ -51,12 +51,12 @@ function launch(manager::Union{PBSManager, SGEManager}, params::Dict, instances_
         end
 
         filename(i) = isPBS ? "$home/julia-$(getpid())-$i.o$id" : "$home/julia-$(getpid()).o$id.$i"
-        print("job id is $id, waiting for job to start ")
+        # print("job id is $id, waiting for job to start ")
         for i=1:np
             # wait for each output stream file to get created
             fname = filename(i)
             while !isfile(fname)
-                print(".")
+                # print(".")
                 sleep(1.0)
             end
             # Hack to get Base to get the host:port, the Julia process has already started.
@@ -70,11 +70,11 @@ function launch(manager::Union{PBSManager, SGEManager}, params::Dict, instances_
             push!(instances_arr, config)
             notify(c)
         end
-        println("")
+        # println("")
 
     catch e
-        println("Error launching qsub")
-        println(e)
+        # println("Error launching qsub")
+        # println(e)
     end
 end
 
